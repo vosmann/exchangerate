@@ -53,4 +53,3 @@ To run unit test, please do:
 * Generalize for all exchange rates, not only EUR-to-USD.
 * Point to a public exchange rate service with more frequent updates. 
 The one at `api.fixer.io` updates only once a day. That's not very granular.
-* Either use nice date/time classes everywhere or strings everywhere.

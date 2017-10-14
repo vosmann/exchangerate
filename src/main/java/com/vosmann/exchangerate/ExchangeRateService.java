@@ -4,7 +4,6 @@ import com.vosmann.exchangerate.storage.RateStorage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -36,9 +35,8 @@ public class ExchangeRateService {
         return storage.latestRate();
     }
 
-    public List<Rate> getFrom(final Period period) {
-
-        return storage.ratesIn(period);
+    public List<Rate> getFrom(String startDate, String endDate) {
+        return storage.ratesIn(startDate, endDate);
     }
 
     private void check() {

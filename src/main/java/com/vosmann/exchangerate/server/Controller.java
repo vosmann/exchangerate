@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Optional;
 
-import static com.vosmann.exchangerate.utils.ExchangeRateDates.periodBetween;
+import static com.vosmann.exchangerate.utils.ExchangeRateDates.isValidPeriod;
 
 /**
  * Delivers the EUR-to-USD exchange rates. Also sanitizes input.
@@ -78,14 +76,13 @@ public class Controller {
     }
 
     private String retrieveRangeRate(String startDate, String endDate) {
-        final Optional<Period> period = periodBetween(startDate, endDate);
-        if (!period.isPresent()) {
-            LOG.error("Could not produce a time period between {} and {}.", startDate, endDate);
+        if (!isValidPeriod(startDate, endDate)) {
+            LOG.error("Invalid dates. startDate: {} endDate: {}.", startDate, endDate);
             return EMPTY_RESPONSE + "; Invalid dates.";
         }
 
         try {
-            final List<Rate> rates = exchangeRateService.getFrom(period.get());
+            final List<Rate> rates = exchangeRateService.getFrom(startDate, endDate);
             final String response = objectMapper.writeValueAsString(rates);
 
             return response;
