@@ -17,12 +17,11 @@ GET calls:
     /rate?select=latest
     /rate?select=range&start_date=2017-09-23&end_date=2017-09-29
             
-    
 Response:
 
     [
         {
-            "timestamp": "",
+            "timestamp": "2017-10-15",
             "dollarsForEuro":1.0
         }
     ]
@@ -35,7 +34,7 @@ There is no persistent storage set up. The retrieved exchange rates are merely
 kept in memory.
 
 ## Tests
-To run unit test, please do:
+To run unit tests, do:
 
     mvn test
 
