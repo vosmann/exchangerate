@@ -7,29 +7,44 @@ import org.apache.logging.log4j.Logger;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.vosmann.exchangerate.utils.ExchangeRateDates.isLessOrEqual;
+import static com.vosmann.exchangerate.utils.RateDates.isLessOrEqual;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
-public class MockRateStorage implements RateStorage {
+public class LimitedInMemoryRateStorage implements RateStorage {
 
-    private static final Logger LOG = LogManager.getLogger(MockRateStorage.class);
+    private static final Logger LOG = LogManager.getLogger(LimitedInMemoryRateStorage.class);
 
-    private static final int MAX_SIZE = 1000;
-    private final LinkedList<Rate> rates = new LinkedList<>();
+    private final int maxSize;
+    private final LinkedList<Rate> rates;
+
+    public LimitedInMemoryRateStorage(int maxSize) {
+        this.maxSize = maxSize;
+        this.rates = new LinkedList<>();
+    }
 
     @Override
     public synchronized void store(Rate rate) {
+        if (!rates.isEmpty() && rates.getLast().equals(rate)) {
+            LOG.info("Not storing identical exchange rate for same timestamp: {}", rate);
+            return;
+        }
+
         rates.add(rate);
-        while (rates.size() > MAX_SIZE) {
+        while (rates.size() > maxSize) {
             rates.removeFirst();
         }
     }
 
     @Override
     public List<Rate> latestRate() {
-        return singletonList(rates.getLast());
+        if (rates.isEmpty()) {
+            return emptyList();
+        } else {
+            return singletonList(rates.getLast());
+        }
     }
 
     @Override
@@ -38,6 +53,10 @@ public class MockRateStorage implements RateStorage {
                                      .filter(rate -> isLessOrEqual(startDate, rate.getTimestamp()))
                                      .filter(rate -> isLessOrEqual(rate.getTimestamp(), endDate))
                                      .collect(toList()));
+    }
+
+    public int size() {
+        return rates.size();
     }
 
 }

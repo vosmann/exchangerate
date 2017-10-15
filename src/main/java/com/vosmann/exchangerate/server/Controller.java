@@ -2,8 +2,8 @@ package com.vosmann.exchangerate.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vosmann.exchangerate.ExchangeRateService;
 import com.vosmann.exchangerate.Rate;
+import com.vosmann.exchangerate.RateService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-import static com.vosmann.exchangerate.utils.ExchangeRateDates.isValidPeriod;
+import static com.vosmann.exchangerate.utils.RateDates.isValidPeriod;
 
 /**
- * Delivers the EUR-to-USD exchange rates. Also sanitizes input.
+ * Delivers the EUR-to-USD exchange rates. Also sanitizes input and serializes responses.
  */
 @RestController
 public class Controller {
@@ -34,7 +34,7 @@ public class Controller {
             "'/rates?select=range&start_date=2017-09-23&start_date=2017-09-29'.";
 
     @Autowired
-    private ExchangeRateService exchangeRateService;
+    private RateService rateService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -50,7 +50,7 @@ public class Controller {
     String getRates(@RequestParam String select,
                     @RequestParam(value = "start_date", required = false) String start,
                     @RequestParam(value = "end_date", required = false) String end) {
-        LOG.info("Received request at /rate.");
+        LOG.info("Received request at /rates.");
 
         switch (select) {
             case SELECT_LATEST:
@@ -63,16 +63,14 @@ public class Controller {
     }
 
     private String retrieveLastRate() {
-
         try {
-            final List<Rate> rate = exchangeRateService.getLatest();
+            final List<Rate> rate = rateService.getLatest();
             final String response = objectMapper.writeValueAsString(rate);
             return response;
         } catch (JsonProcessingException e) {
             LOG.error("Could not produce latest rate.", e);
             return EMPTY_RESPONSE;
         }
-
     }
 
     private String retrieveRangeRate(String startDate, String endDate) {
@@ -82,7 +80,7 @@ public class Controller {
         }
 
         try {
-            final List<Rate> rates = exchangeRateService.getFrom(startDate, endDate);
+            final List<Rate> rates = rateService.getFrom(startDate, endDate);
             final String response = objectMapper.writeValueAsString(rates);
 
             return response;

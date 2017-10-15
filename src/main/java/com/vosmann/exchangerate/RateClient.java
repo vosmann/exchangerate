@@ -19,9 +19,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * Client tailored for use with api.fixer.io only.
  */
-public class ExchangeRateClient {
+public class RateClient {
 
-    private static final Logger LOG = LogManager.getLogger(ExchangeRateClient.class);
+    private static final Logger LOG = LogManager.getLogger(RateClient.class);
 
     // Provides three decimal positions.
     private static final String CURRENCY_API = "http://api.fixer.io/latest?symbols=EUR,USD";
@@ -29,7 +29,7 @@ public class ExchangeRateClient {
     private final AsyncHttpClient client;
     private final ObjectMapper objectMapper;
 
-    public ExchangeRateClient(ObjectMapper objectMapper) {
+    public RateClient(ObjectMapper objectMapper) {
         this.client = new DefaultAsyncHttpClient();
         this.objectMapper = objectMapper;
     }
@@ -72,7 +72,7 @@ public class ExchangeRateClient {
             String date = json.get("date")
                               .textValue();
             return new Rate(date, dollarsForEuro);
-        } catch (IOException | NumberFormatException | NullPointerException e) {
+        } catch (IOException | IllegalArgumentException | NullPointerException e) {
             LOG.error("Could not deserialize response. Body: {}", body, e);
             return null;
         }

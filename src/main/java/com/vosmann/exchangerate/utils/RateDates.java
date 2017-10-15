@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 /**
  * Defines the date format that is to be used in the whole application. Helps with using String dates.
  */
-public class ExchangeRateDates {
+public class RateDates {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
