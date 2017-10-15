@@ -42,11 +42,10 @@ To run unit tests, do:
 
 * Once an actual DB will be queried, add a cache to not always do I/O.
 * Support a finer time range granularity than the current day-only granularity.
-* Don't store new rate if it has the same value and timestamp (with regard to granularity).
 * Improve hacky JSON handling.
 * Add error descriptions to HTTP responses.
 * Trim down Spring's chatty error responses.
-* Remove logic from controller.
+* Cut down on logic in controller.
 * Use an async controller.
 * Generalize for all exchange rates, not only EUR-to-USD.
 * Point to a public exchange rate service with more frequent updates. 
